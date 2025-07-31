@@ -1,77 +1,168 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Em Breve</title>
-  <link rel="icon" type="image/png" href="favicon.png">
+  <title>Lotus | Moda Fitness e Bolsas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
   <style>
-    :root {
-      --gray1: 84; /* #545454 */
-      --gray2: 132; /* #848484 */
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Inter', sans-serif;
+      background-color: #fff;
+      color: #333;
+    }
+    header {
       display: flex;
-      flex-direction: column;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
-      height: 100vh;
+      padding: 20px 40px;
+      border-bottom: 1px solid #ddd;
+    }
+    .logo {
+      font-size: 28px;
+      font-weight: bold;
+      color: #ECCA82;
+      letter-spacing: 1px;
+    }
+    nav a {
+      margin: 0 15px;
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+    nav a:hover {
+      color: #ECCA82;
+    }
+    .promo-banner {
       text-align: center;
-      background: linear-gradient(to bottom, rgb(var(--gray1), var(--gray1), var(--gray1)), rgb(var(--gray2), var(--gray2), var(--gray2)));
-      transition: background 0.2s linear;
+      background-color: #fdf8ef;
+      padding: 20px;
+      font-size: 18px;
+      color: #333;
+      border-top: 2px solid #ECCA82;
+      border-bottom: 2px solid #ECCA82;
     }
-
-    img {
-      max-width: 180px;
-      margin-bottom: 30px;
+    .product-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 40px;
+      padding: 40px;
     }
-
-    h1 {
-      font-size: 3em;
-      color: #E8BF69;
-      margin: 0;
+    .product-card {
+      border: 1px solid #ECCA82;
+      border-radius: 10px;
+      overflow: hidden;
+      width: 300px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
     }
-
-    p {
-      font-size: 1.2em;
-      color: #fff;
-      margin-top: 10px;
+    .product-info {
+      padding: 15px;
+    }
+    .product-info h2 {
+      font-size: 20px;
+      color: #ECCA82;
+      margin-bottom: 5px;
+    }
+    .product-info p {
+      font-size: 16px;
+      margin: 5px 0;
+    }
+    .swiper {
+      width: 100%;
+      height: 320px;
+    }
+    .swiper-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    footer {
+      text-align: center;
+      padding: 20px;
+      border-top: 1px solid #eee;
+      font-size: 14px;
+      color: #777;
+      background-color: #fafafa;
     }
   </style>
 </head>
 <body>
+  <header>
+    <div class="logo">Lotus</div>
+    <nav>
+      <a href="#">Lançamentos</a>
+      <a href="#">Conjuntos</a>
+      <a href="#">Bolsas</a>
+      <a href="#">Moda Fitness</a>
+      <a href="#">Contato</a>
+    </nav>
+  </header>
 
-  <img src="lotus.png" alt="Logo">
-  <h1>Em breve...</h1>
-  <p>Estamos preparando algo especial para você.</p>
+  <div class="promo-banner">
+    🌟 Promoção: 2 por R$199 | 3 por R$289 &nbsp;|&nbsp; Frete grátis acima de R$299
+  </div>
 
+  <div class="product-list" id="product-list"></div>
+
+  <footer>
+    © 2025 Lotus - Moda Fitness e Bolsas. Todos os direitos reservados.
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script src="https://unpkg.com/papaparse@5.3.2/papaparse.min.js"></script>
   <script>
-    let direction = 1;
-    let amount = 0;
-    const max = 8; // controla quão forte é a variação
+    const urlCSV = 'https://docs.google.com/spreadsheets/d/1wvETpHa4EaTArGnRbdE8ieJVGdUwXjE0mJwE6ELS-8w/export?format=csv';
 
-    function animateGradient() {
-      amount += direction * 0.05;
+    Papa.parse(urlCSV, {
+      download: true,
+      header: true,
+      complete: function(results) {
+        const container = document.getElementById("product-list");
+        results.data.forEach((produto, index) => {
+          const imagens = produto.Imagens.split(',').map(img => img.trim());
+          const swiperId = `swiper-${index}`;
 
-      if (amount > max || amount < 0) {
-        direction *= -1;
-        amount = Math.max(0, Math.min(max, amount));
+          const swiperHTML = `
+            <div class="swiper" id="${swiperId}">
+              <div class="swiper-wrapper">
+                ${imagens.map(url => `<div class="swiper-slide"><img src="${url}" alt="${produto.Nome}"></div>`).join('')}
+              </div>
+              <div class="swiper-pagination"></div>
+              <div class="swiper-button-next"></div>
+              <div class="swiper-button-prev"></div>
+            </div>
+          `;
+
+          const card = document.createElement('div');
+          card.className = 'product-card';
+          card.innerHTML = `
+            ${swiperHTML}
+            <div class="product-info">
+              <h2>${produto.Nome}</h2>
+              <p><strong>Preço:</strong> R$ ${produto.Preço}</p>
+              <p><strong>Tamanho:</strong> ${produto.Tamanho}</p>
+            </div>
+          `;
+
+          container.appendChild(card);
+
+          setTimeout(() => {
+            new Swiper(`#${swiperId}`, {
+              loop: true,
+              pagination: { el: '.swiper-pagination', clickable: true },
+              navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev'
+              },
+            });
+          }, 100);
+        });
       }
-
-      const gray1 = Math.round(84 + amount);  // varia de 84 a 92
-      const gray2 = Math.round(132 + amount); // varia de 132 a 140
-
-      document.documentElement.style.setProperty('--gray1', gray1);
-      document.documentElement.style.setProperty('--gray2', gray2);
-
-      requestAnimationFrame(animateGradient);
-    }
-
-    animateGradient();
+    });
   </script>
 </body>
 </html>
