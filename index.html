@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lotus | Moda Fitness e Bolsas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #fff;
+      color: #333;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: bold;
+      color: #ECCA82;
+      letter-spacing: 1px;
+    }
+
+    nav a {
+      margin: 0 15px;
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    nav a:hover {
+      color: #ECCA82;
+    }
+
+    .promo-banner {
+      text-align: center;
+      background-color: #fdf8ef;
+      padding: 20px;
+      font-size: 18px;
+      color: #333;
+      border-top: 2px solid #ECCA82;
+      border-bottom: 2px solid #ECCA82;
+    }
+
+    /* Grid para os produtos */
+    #produtos {
+      display: grid;
+      grid-template-columns: repeat(1, 1fr);
+      gap: 24px;
+      padding: 40px;
+    }
+
+    @media(min-width: 640px) {
+      #produtos {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media(min-width: 768px) {
+      #produtos {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .product-card {
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px rgb(0 0 0 / 0.1);
+      border: 1px solid #ECCA82;
+      overflow: hidden;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s;
+    }
+
+    .product-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .product-info {
+      padding: 1rem;
+    }
+
+    .product-info h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #ECCA82;
+      margin-bottom: 0.25rem;
+    }
+
+    .product-info p {
+      color: #4a4a4a;
+      margin-bottom: 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    /* swiper específico para imagens */
+    .swiper {
+      width: 100%;
+      height: 100%;
+    }
+
+    .swiper-slide {
+      position: relative; /* para o selo ficar posicionado relativo à imagem */
+    }
+
+    .swiper-slide img {
+      max-height: 500px;
+      width: auto;
+      object-fit: contain;
+      margin: 0 auto;
+      display: block;
+      border-radius: 1rem;
+    }
+
+    .selo-novo {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background-color: #ECCA82;
+      color: black;
+      padding: 5px 10px;
+      font-weight: bold;
+      border-radius: 0.5rem;
+      font-size: 0.8rem;
+      z-index: 10;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* detalhe do produto */
+    .product-detail {
+      display: none;
+      padding: 40px;
+      max-width: 700px;
+      margin: auto;
+    }
+
+    .product-detail h2 {
+      font-size: 24px;
+      color: #ECCA82;
+      margin-bottom: 10px;
+    }
+
+    .product-detail p {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    .product-detail .info {
+      font-style: italic;
+      color: #555;
+      margin-top: 20px;
+    }
+
+    .back-btn {
+      display: inline-block;
+      margin-bottom: 20px;
+      background: #ECCA82;
+      color: #000;
+      padding: 10px 20px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      border-radius: 5px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      border-top: 1px solid #eee;
+      font-size: 14px;
+      color: #777;
+      background-color: #fafafa;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="logo">Lotus</div>
+    <nav>
+      <a href="#">Lançamentos</a>
+      <a href="#">Conjuntos</a>
+      <a href="#">Bolsas</a>
+      <a href="#">Moda Fitness</a>
+      <a href="#">Contato</a>
+    </nav>
+  </header>
+
+  <div class="promo-banner">
+    🌟 Promoção: 2 por R$199 | 3 por R$289 &nbsp;|&nbsp; Frete grátis acima de R$299
+  </div>
+
+  <!-- Container onde os produtos serão inseridos -->
+  <div id="produtos"></div>
+
+  <div class="product-detail" id="product-detail">
+    <button class="back-btn" onclick="voltar()">← Voltar</button>
+    <div class="swiper" id="detail-swiper">
+      <div class="swiper-wrapper" id="detail-images"></div>
+      <div class="swiper-pagination" id="detail-pagination"></div>
+      <div class="swiper-button-next" id="detail-next"></div>
+      <div class="swiper-button-prev" id="detail-prev"></div>
+    </div>
+    <div class="product-info">
+      <h2 id="detail-nome"></h2>
+      <p><strong>Preço:</strong> R$ <span id="detail-preco"></span></p>
+      <p><strong>Tamanho:</strong> <span id="detail-tamanho"></span></p>
+      <p class="info" id="detail-info"></p>
+    </div>
+  </div>
+
+  <footer>
+    © 2025 Lotus - Moda Fitness e Bolsas. Todos os direitos reservados.
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script src="https://unpkg.com/papaparse@5.3.2/papaparse.min.js"></script>
+  <script>
+    const urlCSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRuBEr8nZhrjlIIRvKoTXCmL_DK9607GN368cFwD1YSy9fS-_HG3v2GmE7NZPzJ1qRPaRJkjKSEMBVT/pub?output=csv';
+let produtos = [];
+let detailSwiperInstance = null;
+let swiperInstances = {}; // objeto para guardar instâncias swiper dos cards
+
+Papa.parse(urlCSV, {
+  download: true,
+  header: true,
+  complete: function (results) {
+    produtos = results.data;
+    renderProdutos();
+  }
+});
+
+function renderProdutos() {
+  const container = document.getElementById("produtos");
+  container.innerHTML = '';
+
+  // Destrói todas as instâncias swiper anteriores (se existirem)
+  Object.values(swiperInstances).forEach(swiper => swiper.destroy(true, true));
+  swiperInstances = {};
+
+  const produtosValidos = produtos.filter(p => p.Nome && p.Nome.trim() !== '');
+
+  produtosValidos.forEach((produto, index) => {
+    const imagens = produto.Imagens ? produto.Imagens.split(',').map(img => img.trim()) : [];
+    const isNovo = produto["Novo?"] && (produto["Novo?"].toLowerCase() === 'true');
+    const offPercent = parseFloat(produto["Off%"]) || 0;
+    const precoOriginal = parseFloat(produto.Preço) || 0;
+    const precoComDesconto = precoOriginal * (1 - offPercent / 100);
+    const seloNovoHTML = isNovo ? `<div class="selo-novo">Novo</div>` : '';
+
+    // Preço com ou sem desconto
+    let precoHTML = '';
+    if (offPercent > 0) {
+      precoHTML = `
+        <p>
+          <span style="text-decoration: line-through; color: #888;">R$${precoOriginal.toFixed(2)}</span>
+          &nbsp;
+          <span style="color: #ECCA82; font-weight: bold;">R$${precoComDesconto.toFixed(2)}</span>
+        </p>
+      `;
+    } else {
+      precoHTML = `<p>R$${precoOriginal.toFixed(2)}</p>`;
+    }
+
+    // Mostrar só a primeira imagem na lista
+    const primeiraImagem = imagens.length > 0 ? imagens[0] : '';
+
+    // Texto indicando quantas imagens a mais tem (se houver)
+    const imagensExtras = imagens.length > 1 ? `<p style="text-align:center; font-size:0.9rem; color:#555; margin-top:0.25rem;">+${imagens.length - 1} imagem${imagens.length - 1 > 1 ? 'ens' : ''}</p>` : '';
+
+    const card = `
+      <div class="product-card" onclick="mostrarDetalhes(${index})" style="position: relative;">
+        <div style="position: relative;">
+          ${seloNovoHTML}
+          <img src="${primeiraImagem}" alt="${produto.Nome}" style="max-height: 500px; width: auto; object-fit: contain; margin: 0 auto; display: block; border-radius: 1rem;">
+          ${imagensExtras}
+        </div>
+        <div class="product-info">
+          <h2>${produto.Nome}</h2>
+          ${precoHTML}
+          <p>Tamanhos: ${produto.Tamanho}</p>
+        </div>
+      </div>
+    `;
+
+    container.innerHTML += card;
+  });
+}
+
+
+    // Inicializa o Swiper e guarda a instância
+    swiperInstances[swiperId] = new Swiper(`#${swiperId}`, {
+      loop: true,
+      pagination: { el: `#${paginationId}`, clickable: true },
+      navigation: {
+        nextEl: `#${nextId}`,
+        prevEl: `#${prevId}`
+      },
+    });
+
+
+function mostrarDetalhes(index) {
+  const produto = produtos[index];
+  const imagens = produto.Imagens ? produto.Imagens.split(',').map(img => img.trim()) : [];
+
+  document.getElementById('detail-nome').textContent = produto.Nome;
+
+  const offPercent = parseFloat(produto["Off%"]) || 0;
+  const precoOriginal = parseFloat(produto.Preço) || 0;
+  const precoComDesconto = precoOriginal * (1 - offPercent / 100);
+  if (offPercent > 0) {
+    document.getElementById('detail-preco').innerHTML =
+      `<span style="text-decoration: line-through; color: #888;">R$${precoOriginal.toFixed(2)}</span> ` +
+      `<span style="color: #ECCA82; font-weight: bold;">R$${precoComDesconto.toFixed(2)}</span>`;
+  } else {
+    document.getElementById('detail-preco').textContent = precoOriginal.toFixed(2);
+  }
+
+  document.getElementById('detail-tamanho').textContent = produto.Tamanho;
+  document.getElementById('detail-info').textContent = produto.Info || '';
+
+  document.getElementById('detail-images').innerHTML = imagens.map(url => `
+    <div class="swiper-slide">
+      ${produto["Novo?"] && produto["Novo?"].toLowerCase() === 'true' ? `<div class="selo-novo">Novo</div>` : ''}
+      <img src="${url}" alt="${produto.Nome}" style="max-height: 500px; width: auto; object-fit: contain; margin: 0 auto; display: block; border-radius: 1rem;">
+    </div>
+  `).join('');
+
+  document.getElementById('produtos').style.display = 'none';
+  document.getElementById('product-detail').style.display = 'block';
+
+  if (detailSwiperInstance) {
+    detailSwiperInstance.destroy(true, true);
+  }
+
+  detailSwiperInstance = new Swiper('#detail-swiper', {
+    loop: true,
+    pagination: { el: '#detail-pagination', clickable: true },
+    navigation: {
+      nextEl: '#detail-next',
+      prevEl: '#detail-prev'
+    },
+  });
+}
+
+function voltar() {
+  document.getElementById('product-detail').style.display = 'none';
+  document.getElementById('produtos').style.display = 'grid';
+
+  if (detailSwiperInstance) {
+    detailSwiperInstance.destroy(true, true);
+    detailSwiperInstance = null;
+  }
+}
+
+  </script>
+</body>
+
+</html>
