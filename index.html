@@ -121,13 +121,15 @@
     }
 
     .swiper-slide img {
-      max-height: 500px;
-      width: auto;
-      object-fit: contain;
-      margin: 0 auto;
-      display: block;
-      border-radius: 1rem;
-    }
+  max-height: 500px;
+  max-width: 300px;
+  object-fit: contain;
+  aspect-ratio: 300 / 500; /* mantém a proporção */
+  margin: 0 auto;
+  display: block;
+  border-radius: 1rem;
+}
+
 
     .selo-novo {
       position: absolute;
@@ -189,12 +191,23 @@
       color: #777;
       background-color: #fafafa;
     }
+    /* Cor padrão das bolinhas */
+.swiper-pagination-bullet {
+  background-color: #ccc; /* cor padrão das bolinhas */
+  opacity: 1;
+}
+
+/* Cor da bolinha ativa */
+.swiper-pagination-bullet-active {
+  background-color: #ECCA82; /* cor da bolinha ativa */
+}
+
   </style>
 </head>
 
 <body>
   <header>
-    <div class="logo"><img src="lotuslogo.png" style="height: 50px;">Lotus</div>
+    <div class="logo"><img src="lotuslogo.png" style="height: 25px;">Lotus</div>
     <nav>
       <a href="#">Lançamentos</a>
       <a href="#">Conjuntos</a>
@@ -235,6 +248,16 @@
   <script src="https://unpkg.com/papaparse@5.3.2/papaparse.min.js"></script>
   <script>
     const urlCSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRuBEr8nZhrjlIIRvKoTXCmL_DK9607GN368cFwD1YSy9fS-_HG3v2GmE7NZPzJ1qRPaRJkjKSEMBVT/pub?output=csv';
+    redimensionarImagem(urlCSV, 367, 500, function (imagemReduzida) {
+  if (imagemReduzida) {
+    const imgElement = document.createElement("img");
+    imgElement.src = imagemReduzida;
+    document.body.appendChild(imgElement); // ou insere no Swiper
+  } else {
+    console.error("Erro ao carregar ou redimensionar imagem");
+  }
+});
+
 let produtos = [];
 let detailSwiperInstance = null;
 let swiperInstances = {}; // objeto para guardar instâncias swiper dos cards
@@ -256,7 +279,11 @@ function renderProdutos() {
   Object.values(swiperInstances).forEach(swiper => swiper.destroy(true, true));
   swiperInstances = {};
 
-  const produtosValidos = produtos.filter(p => p.Nome && p.Nome.trim() !== '');
+  const produtosValidos = produtos.filter(p =>
+  p.Nome && p.Nome.trim() !== '' &&
+  p.Estoque && parseInt(p.Estoque) > 0 && p.Imagens.trim() !== '' 
+);
+
 
   produtosValidos.forEach((produto, index) => {
     const imagens = produto.Imagens ? produto.Imagens.split(',').map(img => img.trim()) : [];
@@ -285,18 +312,19 @@ function renderProdutos() {
 
     // Texto indicando quantas imagens a mais tem (se houver)
     const imagensExtras = imagens.length > 1 ? `<p style="text-align:center; font-size:0.9rem; color:#555; margin-top:0.25rem;">+${imagens.length - 1} imagem${imagens.length - 1 > 1 ? 'ens' : ''}</p>` : '';
-
+     // card do anuncio
     const card = `
       <div class="product-card" onclick="mostrarDetalhes(${index})" style="position: relative;">
         <div style="position: relative;">
           ${seloNovoHTML}
-          <img src="${primeiraImagem}" alt="${produto.Nome}" style="max-height: 500px; width: auto; object-fit: contain; margin: 0 auto; display: block; border-radius: 1rem;">
+          <img src="${primeiraImagem}" alt="${produto.Nome}" style="max-height: 500px; width: 100%; object-fit: contain; margin: 0 auto; display: block; border-radius: 1rem;aspect-ratio: 300 / 500;">
           ${imagensExtras}
         </div>
         <div class="product-info">
           <h2>${produto.Nome}</h2>
           ${precoHTML}
           <p>Tamanhos: ${produto.Tamanho}</p>
+          <p>Estoque: ${produto.Estoque}</p>
         </div>
       </div>
     `;
@@ -316,6 +344,22 @@ function renderProdutos() {
       },
     });
 
+function redimensionarImagem(url, larguraDesejada, alturaDesejada, callback) {
+  const img = new Image();
+  img.crossOrigin = "Anonymous"; // necessário para evitar erros CORS
+  img.onload = function () {
+    const canvas = document.createElement('canvas');
+    canvas.width = larguraDesejada;
+    canvas.height = alturaDesejada;
+    const ctx = canvas.getContext('2d');
+
+    ctx.drawImage(img, 0, 0, larguraDesejada, alturaDesejada);
+    const novaImagem = canvas.toDataURL('image/jpeg', 0.8); // 80% qualidade
+    callback(novaImagem);
+  };
+  img.onerror = () => callback(null);
+  img.src = url;
+}
 
 function mostrarDetalhes(index) {
   const produto = produtos[index];
